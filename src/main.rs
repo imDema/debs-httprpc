@@ -29,20 +29,25 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "debug".into()),
+                .unwrap_or_else(|_| "proxy=info".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let Some(addr) = std::env::args().nth(1) else {
-        panic!("give me an address as first arg");
-    };
+    if std::env::args().len() != 3 {
+        eprintln!("USAGE: proxy BIND_ADDRESS BACKEND_ADDRESS");
+        std::process::exit(1);
+    }
 
-    let pool = Pool::builder(grpc::GrpcPoolManager::new(&addr))
+    let bind_addr = std::env::args().nth(1).unwrap();
+    let backend_addr = std::env::args().nth(2).unwrap();
+
+    let pool = Pool::builder(grpc::GrpcPoolManager::new(&backend_addr))
         .max_size(128)
         .build()
         .unwrap();
 
+    // ROUTES
     let app = Router::new()
         .route("/create", post(create_new_benchmark))
         .route("/start", post(start_benchmark))
@@ -52,14 +57,15 @@ async fn main() {
         .route("/result_q2", post(result_q2))
         .with_state(pool.clone());
 
-    // run https server
-    let addr: SocketAddr = "127.0.0.1:3030".parse().unwrap();
-    tracing::debug!("listening on {addr}");
+    let addr: SocketAddr = bind_addr.parse().expect("invalid bind address");
+    tracing::info!("starting httprpc with bind_address: {addr}, backend_address: {backend_addr}");
     axum_server::bind(addr)
         .serve(app.into_make_service())
         .await
         .unwrap();
 }
+
+// ENDPOINTS
 
 async fn create_new_benchmark(
     State(pool): State<Pool>,
