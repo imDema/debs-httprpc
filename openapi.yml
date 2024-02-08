@@ -1,6 +1,6 @@
 openapi: "3.0.2"
 info:
-  title: Proxy API
+  title: DEBS Grand Challenge 2024 REST Proxy
   version: 1.0.0
 servers:
   - url: http://challenge2024.debs.org:8080
