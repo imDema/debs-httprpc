@@ -8,11 +8,15 @@ edition = "2021"
 [dependencies]
 async-trait = "0.1.73"
 axum = "0.6.20"
+axum-msgpack = "0.3.0"
 axum-server = { version = "0.5.1", features = ["tls-rustls"] }
 deadpool = "0.10.0"
 once_cell = "1.18.0"
 prost = "0.12.1"
 prost-types = "0.12.1"
+prost-wkt-types = "0.4.2"
+rand = { version = "0.8.5", features = ["small_rng"] }
+rmp-serde = "1.1.2"
 rustls = "0.21.7"
 serde = { version = "1.0.188", features = ["derive"] }
 tokio = { version = "1.32.0", features = ["full"] }
@@ -29,4 +33,4 @@ path = "src/server.rs"
 
 [[bin]]
 name = "proxy"
-path = "src/main.rs"
+path = "src/proxy.rs"

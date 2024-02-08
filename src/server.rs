@@ -1,11 +1,13 @@
+//! Dummy server
+use rand::distributions::Standard;
+use rand::prelude::*;
+
 use tonic::{transport::Server, Response};
 
-pub mod api {
-    tonic::include_proto!("challenger");
-}
+mod api;
+use api::*;
 
 use api::challenger_server::{Challenger, ChallengerServer};
-use api::*;
 use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 
@@ -36,8 +38,17 @@ impl Challenger for DumbServer {
         Ok(Response::new(Batch {
             seq_id: 2,
             last: false,
-            lookup_symbols: vec!["asd".into()],
-            events: vec![],
+            day_end: false,
+            vault_ids: vec![1001, 1003],
+            cluster_ids: vec![5, 6],
+            states: vec![DriveState {
+                date: Some(Timestamp { seconds: 12345345, nanos: 5467 }),
+                serial_number: "1234567890".into(),
+                model: "MODEL12345".into(),
+                failure: false,
+                vault_id: 1003,
+                readings: SmallRng::from_rng(thread_rng()).unwrap().sample_iter(Standard).take(35).collect(),
+            }],
         }))
     }
     /// post the result
@@ -67,7 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "debug".into()),
+                .unwrap_or_else(|_| "h2=info,debug".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();

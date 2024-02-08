@@ -1,6 +1,5 @@
-use deadpool::managed;
-
 use crate::api::challenger_client::ChallengerClient;
+use deadpool::managed;
 
 pub type Client = ChallengerClient<tonic::transport::Channel>;
 
@@ -25,7 +24,7 @@ impl deadpool::managed::Manager for GrpcPoolManager {
 
     async fn recycle(
         &self,
-        _: &mut Self::Type,
+        _conn: &mut Self::Type,
         metrics: &managed::Metrics,
     ) -> managed::RecycleResult<Self::Error> {
         if metrics.age() < std::time::Duration::from_secs(60) {

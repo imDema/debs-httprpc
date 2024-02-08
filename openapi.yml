@@ -1,0 +1,347 @@
+openapi: "3.0.2"
+info:
+  title: Proxy API
+  version: 1.0.0
+servers:
+  - url: http://challenge2024.debs.org:8080
+paths:
+  /json/create:
+    post:
+      summary: Create a new benchmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BenchmarkConfiguration"
+      responses:
+        "200":
+          description: Benchmark created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Benchmark"
+        "400":
+          description: Bad request
+  /json/start:
+    post:
+      summary: Start a benchmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Benchmark"
+      responses:
+        "200":
+          description: Benchmark started successfully
+        "400":
+          description: Bad request
+  /json/end:
+    post:
+      summary: End a benchmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Benchmark"
+      responses:
+        "200":
+          description: Benchmark ended successfully
+        "400":
+          description: Bad request
+  /json/next_batch:
+    post:
+      summary: Get the next batch of a benchmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Benchmark"
+      responses:
+        "200":
+          description: Next batch retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Batch"
+        "400":
+          description: Bad request
+  /json/result_q1:
+    post:
+      summary: Post the result of Q1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResultQ1"
+      responses:
+        "200":
+          description: Result posted successfully
+        "400":
+          description: Bad request
+  /json/result_q2:
+    post:
+      summary: Post the result of Q2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResultQ2"
+      responses:
+        "200":
+          description: Result posted successfully
+        "400":
+          description: Bad request
+
+  # /msgpack/create:
+  #   post:
+  #     summary: Create a new benchmark
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/msgpack:
+  #           schema:
+  #             $ref: "#/components/schemas/BenchmarkConfiguration"
+  #     responses:
+  #       "200":
+  #         description: Benchmark created successfully
+  #         content:
+  #           application/msgpack:
+  #             schema:
+  #               $ref: "#/components/schemas/Benchmark"
+  #       "400":
+  #         description: Bad request
+  # /msgpack/start:
+  #   post:
+  #     summary: Start a benchmark
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/msgpack:
+  #           schema:
+  #             $ref: "#/components/schemas/Benchmark"
+  #     responses:
+  #       "200":
+  #         description: Benchmark started successfully
+  #       "400":
+  #         description: Bad request
+  # /msgpack/end:
+  #   post:
+  #     summary: End a benchmark
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/msgpack:
+  #           schema:
+  #             $ref: "#/components/schemas/Benchmark"
+  #     responses:
+  #       "200":
+  #         description: Benchmark ended successfully
+  #       "400":
+  #         description: Bad request
+  # /msgpack/next_batch:
+  #   post:
+  #     summary: Get the next batch of a benchmark
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/msgpack:
+  #           schema:
+  #             $ref: "#/components/schemas/Benchmark"
+  #     responses:
+  #       "200":
+  #         description: Next batch retrieved successfully
+  #         content:
+  #           application/msgpack:
+  #             schema:
+  #               $ref: "#/components/schemas/Batch"
+  #       "400":
+  #         description: Bad request
+  # /msgpack/result_q1:
+  #   post:
+  #     summary: Post the result of Q1
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/msgpack:
+  #           schema:
+  #             $ref: "#/components/schemas/ResultQ1"
+  #     responses:
+  #       "200":
+  #         description: Result posted successfully
+  #       "400":
+  #         description: Bad request
+  # /msgpack/result_q2:
+  #   post:
+  #     summary: Post the result of Q2
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/msgpack:
+  #           schema:
+  #             $ref: "#/components/schemas/ResultQ2"
+  #     responses:
+  #       "200":
+  #         description: Result posted successfully
+  #       "400":
+  #         description: Bad request
+
+components:
+  schemas:
+    DriveState:
+      type: object
+      required:
+        - date
+        - serial_number
+        - model
+        - failure
+        - vault_id
+        - readings
+      properties:
+        date:
+          type: string
+          format: date-time
+          example: "2022-01-01T00:00:00Z"
+        serial_number:
+          type: string
+          example: "SN12345K123Q654321"
+        model:
+          type: string
+          example: "D12345"
+        failure:
+          type: boolean
+          example: false
+        vault_id:
+          type: integer
+          example: 1008
+        readings:
+          type: array
+          items:
+            type: integer
+          example: [1, 2, 3, 4]
+    Batch:
+      type: object
+      required:
+        - seq_id
+        - last
+        - day_end
+        - vault_ids
+        - cluster_ids
+        - states
+      properties:
+        seq_id:
+          type: integer
+          example: 1
+        last:
+          type: boolean
+          example: false
+        day_end:
+          type: boolean
+          example: true
+        vault_ids:
+          type: array
+          items:
+            type: integer
+            example: 1
+        cluster_ids:
+          type: array
+          items:
+            type: integer
+            example: 1
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/DriveState'
+    Benchmark:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          example: 1
+    VaultFailures:
+      type: object
+      required:
+        - vault_id
+        - failures
+      properties:
+        vault_id:
+          type: integer
+          example: 1
+        failures:
+          type: integer
+          example: 3
+    ResultQ1:
+      type: object
+      required:
+        - benchmark_id
+        - batch_seq_id
+        - entries
+      properties:
+        benchmark_id:
+          type: integer
+          example: 1
+        batch_seq_id:
+          type: integer
+          example: 1
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/VaultFailures'
+    ClusterInfo:
+      type: object
+      required:
+        - cluster_id
+        - size
+      properties:
+        cluster_id:
+          type: integer
+          example: 12
+        size:
+          type: integer
+          example: 256
+    ResultQ2:
+      type: object
+      required:
+        - benchmark_id
+        - batch_seq_id
+        - entries
+      properties:
+        benchmark_id:
+          type: integer
+          example: 1
+        batch_seq_id:
+          type: integer
+          example: 1
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClusterInfo'
+    BenchmarkConfiguration:
+      type: object
+      required:
+        - token
+        - benchmark_name
+        - benchmark_type
+        - queries
+      properties:
+        token:
+          type: string
+          example: "token123"
+        benchmark_name:
+          type: string
+          example: "Benchmark1"
+        benchmark_type:
+          type: string
+          example: "test"
+        queries:
+          type: array
+          items:
+            type: integer
+          example: [0, 1]
